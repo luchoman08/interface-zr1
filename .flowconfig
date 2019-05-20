@@ -1,0 +1,11 @@
+[ignore]
+.*/dist/.*
+.*/node_modules/.*
+[include]
+[libs]
+node_modules/iflow-jquery/index.js.flow
+./types/cheerio/export.flow.js
+./types/axios/export.flow.js
+[options]
+all=true
+suppress_comment= \\(.\\|\n\\)*\\$flow-disable-line
