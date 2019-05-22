@@ -1,8 +1,16 @@
-import { RegistroHistorialAcademico } from "../../sra/models/RegistroHistorialAcademico.js";
-function r(){
+import { type KernelInterface as SRAKernel } from "../../sra/kernel.js";
 
-}
- export interface SRAHandler {
-     obtenerHistorialAcademico(doc: string): RegistroHistorialAcademico;
-     buscarResultados(nombres: string, apellidos: string): any/** To do Resultados */;
+ export interface SRAHandlerInterface {
+     sraApp: SRAKernel ;
+     getSRAApp(): SRAKernel;
+ }
+
+ export class SRAHandler implements SRAHandlerInterface {
+    sraApp: SRAKernel 
+    getSRAApp(): SRAKernel {
+        return this.sraApp;
+    } 
+    constructor(sraApp: SRAKernel) {
+        this.sraApp = sraApp;
+    }
  }

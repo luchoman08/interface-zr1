@@ -1,6 +1,6 @@
 export class EntradaParaBusquedaEstudiante {
     doc_number: string;
-    nombre: string;
-    apellido: string;
+    nombres: string;
+    apellidos: string;
     codigo_programa: string;
 }

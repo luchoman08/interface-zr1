@@ -1,4 +1,11 @@
-import { RegistroHistorialAcademico } from "../../sra/models/RegistroHistorialAcademico.js";
-function r(){
+import { } from "../../sra/kernel.js";
 
-}
+
+ export class SRAHandler {
+    getSRAApp() {
+        return this.sraApp;
+    } 
+    constructor(sraApp) {
+        this.sraApp = sraApp;
+    }
+ }

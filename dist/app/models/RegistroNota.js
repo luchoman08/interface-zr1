@@ -4,7 +4,6 @@ export class RegistroNota {
      * @var string
      * Ejemplo: 910001M
      */
-
     /**
      * @var number
      */

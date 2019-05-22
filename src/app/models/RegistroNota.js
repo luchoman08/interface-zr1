@@ -5,7 +5,7 @@ export class RegistroNota {
      * Ejemplo: 910001M
      */
     codigo_materia: string;
-
+    cancela_materia: boolean;
     /**
      * @var number
      */
@@ -26,10 +26,10 @@ export class RegistroNota {
      */
     nombre_materia: string;
 
-    grupo: number;
+    grupo: string;
     /**
      * @var string
      * Ejemplos: ['4.5', '1,2', '5']
      */
-    nota: Number;
+    nota: string;
 }

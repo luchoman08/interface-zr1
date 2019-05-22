@@ -33,10 +33,6 @@ function extractGradeRegistry(el) {
     }
 }
 
-function printElement(el) {
-    const $ = cheerio.load(el);
-    console.log($.html());
-}
 
 function extractPeriodTrGrades($) {
     const trs = $('tr');
