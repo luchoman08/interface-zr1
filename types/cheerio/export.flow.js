@@ -195,7 +195,7 @@ declare interface CheerioElement {
   attribs: {
     [attr: string]: string
   };
-  children: CheerioElement[];
+  childNodeschildren: CheerioElement[];
   childNodes: CheerioElement[];
   lastChild: CheerioElement;
   firstChild: CheerioElement;

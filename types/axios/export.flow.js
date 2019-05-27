@@ -128,5 +128,5 @@ declare export type AxiosStatic = {
   spread<T, R>(callback: (...args: T[]) => R): (array: T[]) => R
 } & AxiosInstance;
 declare var Axios: AxiosStatic;
+declare export default AxiosStatic;
 }
-declare export default typeof Axios;
