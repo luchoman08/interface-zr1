@@ -9,6 +9,8 @@ export class RegistrosHistorialAcademico {
     registros: Array<RegistroHistorialAcademico>;
 
     codigo_estudiante: string;
+    documento_estudiante: string;
+    programa_estudiante: string;
     constructor() {
         this.registros = [];
     }

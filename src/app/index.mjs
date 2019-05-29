@@ -20,8 +20,8 @@ async function main() {
 }*/
 
 async function main() {
-    var appKernel = new Kernel('PHPSESSID=68b290b0a35e728279d8ab4a73c9b7ec');
-    const registries = await appKernel.getStudentService().getStudentAcademicHistories(document_numbers.slice(610)) ;
+    var appKernel = new Kernel('PHPSESSID=2c0f94a5c9c5ed4def572298887c7581');
+    const registries = await appKernel.getStudentService().getStudentAcademicHistories(document_numbers.slice(0,1)) ;
     const date = new Date();
     fs.writeFile(
         `./historicos-academicos-json/results-${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.json`,
