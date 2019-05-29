@@ -2,10 +2,31 @@ import { RegistrosHistorialAcademico } from "../models/RegistrosHistorialAcademi
 import { RegistroHistorialAcademico } from "../models/RegistroHistorialAcademico.mjs";
 import cheerio  from "cheerio";
 import { RegistroNota } from "../models/RegistroNota.mjs";
+import { NONAME } from "dns";
 function getPeriodTables($: CheerioStatic): Cheerio {
     return $('table[width="95%"]table[cellspacing="1"]table[align="center"]');
 }
 
+function getStudentInfoList($: CheerioStatic): Cheerio {
+    return $('img[src*="ico_personal.gif"]')
+    .parent()
+    .parent()
+    .find('b');
+
+}
+function extractStudentInfo($: CheerioStatic, registros: RegistrosHistorialAcademico) {
+    const infoList = getStudentInfoList($);
+    const documentTypeAndDocumentNumber = infoList.get(1).firstChild.data.split(' '); // C.C 1058847077
+    const [_, document] = documentTypeAndDocumentNumber;
+    registros.documento = document;
+    const programCodeAndSedCodeAndStudyTimeAndProgramName = infoList.get(2).firstChild.data.split('-') // 3746-00-DIU-MATEMATICAS
+    const [programCode, ...__] = programCodeAndSedCodeAndStudyTimeAndProgramName;
+    registros.codigo_programa = programCode;
+    const studentCodeAndStudentName = infoList.get(0).firstChild.data.split(' -- ');// 201522006 -- ARTEAGA ESTACIO GUSTAVO ADOLFO 
+    const [studentCode, studentName] = studentCodeAndStudentName;
+    registros.nombre_estudiante = studentName.trim();
+    registros.codigo_estudiante = studentCode.trim();
+}
 function extractGradeRegistry(el: CheerioElement) : any {
     if(! (el && el.childNodes) ) {
         return
@@ -128,5 +149,6 @@ export  function htmlToAcademicRegistries(html: any): RegistrosHistorialAcademic
         let registro = periodTableToAcademicRegistry(table);
         historialAcademico.registros.push(registro);
     });
+    extractStudentInfo($, historialAcademico);
     return historialAcademico;
 }
