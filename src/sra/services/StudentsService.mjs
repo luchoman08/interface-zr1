@@ -1,14 +1,14 @@
 import { 
-    EntradaParaBusquedaEstudiante,
+    StudentSearchInput,
     Estudiante,
     RegistrosHistorialAcademico
-} from '../models/index.mjs';
+} from '../../models/index.mjs';
 
 import qs from 'qs';
 import fs from 'fs';
 import { getSearchPatron, extractStudentsResults } from "../lib/search-student.mjs";
 import type { ApiServiceInterface } from './ApiService.mjs';
-import type { TipoBusquedaEstudianteType } from '../models/index.mjs';
+import type { TipoBusquedaEstudianteType } from '../../models/index.mjs';
 import type { AxiosPromise } from 'axios';
 import { extractStudentResolution } from "../lib/student-academic-folder.mjs";
 import { htmlToAcademicRegistries } from "../lib/academic-history.mjs";
@@ -17,7 +17,7 @@ export interface StudentsServiceInterface {
     getStudentAcademicHistory(student: Estudiante): Promise <RegistrosHistorialAcademico>;
     getStudentResolution(student: Estudiante):  Promise<string>;
     searchStudent(
-        input: EntradaParaBusquedaEstudiante,
+        input: StudentSearchInput,
         method?: TipoBusquedaEstudianteType ): Promise<Estudiante[]>;
 }
 class PostForStudentFolder {
@@ -205,14 +205,15 @@ class PostForAcademicHistoryFolder {
 }
 export class StudentsService implements StudentsServiceInterface{
     apiService: ApiServiceInterface;
-    async searchStudent(input: EntradaParaBusquedaEstudiante, method?: TipoBusquedaEstudianteType ): Promise<Estudiante[]> {
+    async searchStudent(input: StudentSearchInput, method?: TipoBusquedaEstudianteType ): Promise<Estudiante[]> {
         let arr: Array<Estudiante> = [];
         let url = 'paquetes/herramientas/wincombo.php';
         const patron = getSearchPatron(input, method);
         const params = { opcion: 'estudianteConsulta', variableCalculada: 0, patron  }
+     
         const response = await this.apiService.get(url, params);
-        let html = response;
-        return extractStudentsResults(response);
+        const results = extractStudentsResults(response);
+        return results;
     }
     async getStudentAcademicHistory(student: Estudiante, saveHtmlFiles:boolean = true): Promise <RegistrosHistorialAcademico> {
         let url = '/paquetes/academica/index.php';
@@ -256,7 +257,8 @@ export class StudentsService implements StudentsServiceInterface{
             jornada: student.jornada,
             program_code: student.codigo_programa,
         });
-        const html = await this.apiService.post(url, qs.stringify(data));
+        const urlData =  qs.stringify(data);
+        const html = await this.apiService.post(url, urlData);
         const studentResolution =  extractStudentResolution(html);
         return studentResolution;
     }

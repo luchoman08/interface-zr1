@@ -1,11 +1,14 @@
-import { Kernel } from "./kernel.mjs";
+import { Kernel } from "../sra/kernel.mjs";
 import { htmlToAcademicRegistries } from '../sra/lib/academic-history';
-import { TipoBusquedaEstudianteEnum, EntradaParaBusquedaEstudiante, RegistrosHistorialAcademico } from "./models/index.mjs";
+import { TipoBusquedaEstudianteEnum, StudentSearchInput, RegistrosHistorialAcademico } from "../models/index.mjs";
 import { document_numbers } from "./docs_to_download.mjs";
+import { codes } from "./codes_to_download.mjs";
+
 import fs from 'fs';
 // $FlowFixMe
 import  ObjectsToCsv from 'objects-to-csv';
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+var appKernel = new Kernel("PHPSESSID=ff710d9d0115bf3ce361d5b1ed555ceb");
 
 
 /**
@@ -13,8 +16,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 
 async function main() {
-    var appKernel = new Kernel('PHPSESSID=ca482fb1f1822c7f089d5fa81f90a0ae');
-    var inputBusqueda = new EntradaParaBusquedaEstudiante();
+    var inputBusqueda = new StudentSearchInput();
     inputBusqueda.doc_number = "1085339336";
     inputBusqueda.nombres = "DANIEL DAVID";
     inputBusqueda.codigo_estudiante = "201010274";
@@ -35,7 +37,6 @@ async function main() {
 consulta la información sra disponible en red basado en un array de numeros de documento
 
 async function main() {
-    var appKernel = new Kernel('PHPSESSID=ca482fb1f1822c7f089d5fa81f90a0ae');
     const registries = await appKernel.getStudentService().getStudentAcademicHistories(document_numbers) ;
     const date = new Date();
     fs.writeFile(
@@ -149,7 +150,7 @@ function main() {
 /*
 Extrae información de el json y la guarda detallada por semestre (sin notas)
 */
-
+/*
 function main() {
     const registriesContent = fs.readFileSync('./historicos-academicos-json/results-2019-4-31-17-56-4.json', 'utf8');
     const registries = JSON.parse(registriesContent);
@@ -160,7 +161,7 @@ function main() {
     console.log(rows[0]);
     new ObjectsToCsv(rows).toDisk('./csv-files/student-semesters.csv');
 }
-
+*/
 /**
  * Extrae la información de un json y reinicia la busqueda en los html locales
 
@@ -195,4 +196,54 @@ function main() {
 
  }
  */
+
+
+/**
+ * Descarga la información desde el sra y la guarda en un csv por notas
+ */
+// async function main() {
+    
+//     const registries: Array<RegistrosHistorialAcademico> = [];
+//     for(let code of codes ) {
+//         let input = new StudentSearchInput();
+//         let failedCodes = [];
+//         input.codigo_estudiante = String(code);
+//         var searchResult = await appKernel.studentService.searchStudent(input, TipoBusquedaEstudianteEnum.codigoCompleto);
+//         console.log(searchResult, 'search result', code, "code");
+//         if(searchResult.length===0) {
+//             console.error(`El estudiante con código ${code} no se ha encontrado`);
+//             failedCodes.push(code);
+//         } else {
+//             var academicHistory = await appKernel.studentService.getStudentAcademicHistory(searchResult[0]);
+//             registries.push(academicHistory);
+//         }
+//         console.log(failedCodes, 'failed codes');
+
+//     }
+//     var rows = [];
+//     registries.forEach(registry => {
+//         rows = rows.concat(academic_history_object_to_rows(registry));
+//     });
+//     console.log(rows[0]);
+//     new ObjectsToCsv(rows).toDisk('./csv-files/academic-histories.csv');
+// }
+
+
+async function main() {
+    const registries = await appKernel.getStudentService().getStudentAcademicHistories(document_numbers) ;
+    const date = new Date();
+    fs.writeFile(
+        `./historicos-academicos-json/results-${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.json`,
+        JSON.stringify(registries),
+        function(err) {
+            if(err) {
+                return console.log(err);
+            }
+        
+            console.log("The file was saved!");
+        });
+
+    }
+
+
 main();

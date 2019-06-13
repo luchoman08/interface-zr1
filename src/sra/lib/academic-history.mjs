@@ -1,8 +1,7 @@
-import { RegistrosHistorialAcademico } from "../models/RegistrosHistorialAcademico.mjs";
-import { RegistroHistorialAcademico } from "../models/RegistroHistorialAcademico.mjs";
+import { RegistrosHistorialAcademico } from "../../models/RegistrosHistorialAcademico.mjs";
+import { RegistroHistorialAcademico } from "../../models/RegistroHistorialAcademico.mjs";
 import cheerio  from "cheerio";
-import { RegistroNota } from "../models/RegistroNota.mjs";
-import { NONAME } from "dns";
+import { RegistroNota } from "../../models/RegistroNota.mjs";
 function getPeriodTables($: CheerioStatic): Cheerio {
     return $('table[width="95%"]table[cellspacing="1"]table[align="center"]');
 }
@@ -14,13 +13,14 @@ function getStudentInfoList($: CheerioStatic): Cheerio {
     .find('b');
 
 }
+
+
 function extractStudentInfo($: CheerioStatic, registros: RegistrosHistorialAcademico) {
     const infoList = getStudentInfoList($);
     const documentTypeAndDocumentNumber = infoList.get(1).firstChild.data.split(' '); // C.C 1058847077
     const [_, document] = documentTypeAndDocumentNumber;
     registros.documento = document;
     const programCodeAndSedCodeAndStudyTimeAndProgramName = infoList.get(2).firstChild.data.split('-') // 3746-00-DIU-MATEMATICAS
-    console.log(programCodeAndSedCodeAndStudyTimeAndProgramName);
     const [programCode, sedCode, __, programName] = programCodeAndSedCodeAndStudyTimeAndProgramName;
     registros.codigo_programa = programCode;
     registros.codigo_sede = sedCode;
@@ -30,6 +30,9 @@ function extractStudentInfo($: CheerioStatic, registros: RegistrosHistorialAcade
     registros.nombre_estudiante = studentName.trim();
     registros.codigo_estudiante = studentCode.trim();
 }
+/**
+ * 
+ */
 function extractGradeRegistry(el: CheerioElement) : any {
     if(! (el && el.childNodes) ) {
         return
@@ -84,7 +87,8 @@ function extractGrades($: CheerioStatic): Array<RegistroNota> {
     return grades;
 }
 function extractPeriodNameFromTable($: CheerioStatic): string {
-    return $('td').first().text().trim();
+    const periodText =  $('td').first().text().trim();
+    return periodText.replace('PERIODO: ', '');
 }
 function isLowAcademicPerformancePeriod($: CheerioStatic): bool {
     const title = "Bajos Rendimientos";
@@ -146,7 +150,7 @@ function getTotalAverage($: CheerioStatic): string {
     return $('.error').find('font').find('b').text();
 }
 
-export  function htmlToAcademicRegistries(html: any): RegistrosHistorialAcademico {
+export  function htmlToAcademicRegistries(html: any /** string */): RegistrosHistorialAcademico {
     const historialAcademico = new RegistrosHistorialAcademico();
     var $ = cheerio.load(html);
     const periodTables = getPeriodTables($);
