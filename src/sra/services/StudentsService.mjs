@@ -14,7 +14,8 @@ import { extractStudentResolution } from "../lib/student-academic-folder.mjs";
 import { htmlToAcademicRegistries } from "../lib/academic-history.mjs";
 export interface StudentsServiceInterface {
     apiService: ApiServiceInterface;
-    getStudentAcademicHistory(student: Estudiante): Promise <RegistrosHistorialAcademico>;
+    getStudentPeriods(student: Estudiante): Promise<Date[]>;
+    getStudentAcademicHistory(student: Estudiante, period?: string, saveHtmlFiles?:boolean): Promise <RegistrosHistorialAcademico>;
     getStudentResolution(student: Estudiante):  Promise<string>;
     searchStudent(
         input: StudentSearchInput,
@@ -186,7 +187,7 @@ class PostForAcademicHistoryFolder {
      constructor(input: {
          hia_est_codigo: string, hia_per_codigo: string,
           hia_pra_codigo: string, hia_sed_codigo: string, 
-          hia_rep_codigo: string, tipo_carpeta?: string, hia_jor_codigo: string})
+          hia_rep_codigo: string, tipo_carpeta?: string, hia_jor_codigo: string, detalleCarpeta?: string})
      {
 
          this.accion = 'mostrarDetalleUnaCarpeta';
@@ -198,11 +199,25 @@ class PostForAcademicHistoryFolder {
          this.modulo = 'Academica';
          this.Ventana = '';
          this.versionImprimible= '';
-         this.DetalleCarpeta = 'COMPLETA';
+         this.DetalleCarpeta = input.detalleCarpeta? input.detalleCarpeta : 'COMPLETA';
          this.TipoCarpeta = input.tipo_carpeta? input.tipo_carpeta: 'COMPLETA';
          this.hia_jor_codigo = input.hia_jor_codigo? input.hia_jor_codigo: 'DIU';
      }
 }
+function studentToPostForStudentFolder(student: Estudiante): PostForStudentFolder{
+    const data = new PostForStudentFolder({
+        studentCode: student.codigo_estudiante,
+        sedCode: student.codigo_sede,
+        personCode: student.codigo_persona,
+        studentName: student.nombre,
+        studentLastName: student.apellidos,
+        jornada: student.jornada,
+        program_code: student.codigo_programa,
+    });
+
+    return data;
+}
+
 export class StudentsService implements StudentsServiceInterface{
     apiService: ApiServiceInterface;
     async searchStudent(input: StudentSearchInput, method?: TipoBusquedaEstudianteType ): Promise<Estudiante[]> {
@@ -215,7 +230,7 @@ export class StudentsService implements StudentsServiceInterface{
         const results = extractStudentsResults(response);
         return results;
     }
-    async getStudentAcademicHistory(student: Estudiante, saveHtmlFiles:boolean = true): Promise <RegistrosHistorialAcademico> {
+    async getStudentAcademicHistory(student: Estudiante, period?: string, saveHtmlFiles:boolean = true): Promise <RegistrosHistorialAcademico> {
         let url = '/paquetes/academica/index.php';
         if(student.codigo_resolucion === undefined || student.codigo_resolucion === '' ) {
             student.codigo_resolucion = await this.getStudentResolution(student);
@@ -246,17 +261,18 @@ export class StudentsService implements StudentsServiceInterface{
         academicHistory.codigo_estudiante = student.codigo_estudiante;
         return academicHistory;
     }
+
+    async getStudentPeriods(student: Estudiante): Promise<Date[]>{
+        let url = '/paquetes/academica/index.php';
+        const data = studentToPostForStudentFolder(student);
+        const urlData = qs.stringify(data);
+        const html = await this.apiService.post(url, urlData);
+        
+    }
+
     async getStudentResolution(student: Estudiante): Promise<string> {
         let url = '/paquetes/academica/index.php';
-        const data = new PostForStudentFolder({
-            studentCode: student.codigo_estudiante,
-            sedCode: student.codigo_sede,
-            personCode: student.codigo_persona,
-            studentName: student.nombre,
-            studentLastName: student.apellidos,
-            jornada: student.jornada,
-            program_code: student.codigo_programa,
-        });
+        const data = studentToPostForStudentFolder(student);
         const urlData =  qs.stringify(data);
         const html = await this.apiService.post(url, urlData);
         const studentResolution =  extractStudentResolution(html);

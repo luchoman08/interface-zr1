@@ -4,7 +4,8 @@
   "description": "",
   "main": "main.mjs",
   "scripts": {
-    "test": "npm run flow:build && npm run mjs-mocha \"dist/tests/integration\"",
+    "test-all": "npm run flow:build && npm run mjs-mocha \"dist/tests/integration\"",
+    "test-one": "npm run flow:build && npm run mjs-mocha ",
     "mjs-mocha": "mjs-mocha",
     "flow": "flow",
     "flow-typed": "flow-typed",

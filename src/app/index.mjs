@@ -201,49 +201,49 @@ function main() {
 /**
  * Descarga la información desde el sra y la guarda en un csv por notas
  */
-// async function main() {
-    
-//     const registries: Array<RegistrosHistorialAcademico> = [];
-//     for(let code of codes ) {
-//         let input = new StudentSearchInput();
-//         let failedCodes = [];
-//         input.codigo_estudiante = String(code);
-//         var searchResult = await appKernel.studentService.searchStudent(input, TipoBusquedaEstudianteEnum.codigoCompleto);
-//         console.log(searchResult, 'search result', code, "code");
-//         if(searchResult.length===0) {
-//             console.error(`El estudiante con código ${code} no se ha encontrado`);
-//             failedCodes.push(code);
-//         } else {
-//             var academicHistory = await appKernel.studentService.getStudentAcademicHistory(searchResult[0]);
-//             registries.push(academicHistory);
-//         }
-//         console.log(failedCodes, 'failed codes');
-
-//     }
-//     var rows = [];
-//     registries.forEach(registry => {
-//         rows = rows.concat(academic_history_object_to_rows(registry));
-//     });
-//     console.log(rows[0]);
-//     new ObjectsToCsv(rows).toDisk('./csv-files/academic-histories.csv');
-// }
-
-
 async function main() {
-    const registries = await appKernel.getStudentService().getStudentAcademicHistories(document_numbers) ;
-    const date = new Date();
-    fs.writeFile(
-        `./historicos-academicos-json/results-${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.json`,
-        JSON.stringify(registries),
-        function(err) {
-            if(err) {
-                return console.log(err);
-            }
-        
-            console.log("The file was saved!");
-        });
+    
+    const registries: Array<RegistrosHistorialAcademico> = [];
+     for(let code of codes ) {
+         let input = new StudentSearchInput();
+         let failedCodes = [];
+         input.codigo_estudiante = String(code);
+         var searchResult = await appKernel.studentService.searchStudent(input, TipoBusquedaEstudianteEnum.codigoCompleto);
+        console.log(searchResult, 'search result', code, "code");
+        if(searchResult.length===0) {
+            console.error(`El estudiante con código ${code} no se ha encontrado`);
+            failedCodes.push(code);
+        } else {
+            var academicHistory = await appKernel.studentService.getStudentAcademicHistory(searchResult[0]);
+            registries.push(academicHistory);
+        }
+        console.log(failedCodes, 'failed codes');
 
     }
+    var rows = [];
+    registries.forEach(registry => {
+        rows = rows.concat(academic_history_object_to_rows(registry));
+    });
+    console.log(rows[0]);
+    new ObjectsToCsv(rows).toDisk('./csv-files/academic-histories.csv');
+}
+
+
+// async function main() {
+//     const registries = await appKernel.getStudentService().getStudentAcademicHistories(document_numbers) ;
+//     const date = new Date();
+//     fs.writeFile(
+//         `./historicos-academicos-json/results-${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}.json`,
+//         JSON.stringify(registries),
+//         function(err) {
+//             if(err) {
+//                 return console.log(err);
+//             }
+        
+//             console.log("The file was saved!");
+//         });
+
+//     }
 
 
 main();
