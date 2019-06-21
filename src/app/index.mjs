@@ -8,7 +8,7 @@ import fs from 'fs';
 // $FlowFixMe
 import  ObjectsToCsv from 'objects-to-csv';
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-var appKernel = new Kernel("PHPSESSID=ff710d9d0115bf3ce361d5b1ed555ceb");
+var appKernel = new Kernel("PHPSESSID=c6ce45e532ecfe482cdffe21f9a8e0a2");
 
 
 /**
@@ -221,11 +221,16 @@ async function main() {
 
     }
     var rows = [];
+    var rows2 = [];
     registries.forEach(registry => {
-        rows = rows.concat(academic_history_object_to_rows(registry));
+        //rows = rows.concat(academic_history_object_to_rows(registry));
+        rows2 = rows2.concat(academic_history_object_to_semestral_rows(registry));
     });
     console.log(rows[0]);
-    new ObjectsToCsv(rows).toDisk('./csv-files/academic-histories.csv');
+    //console.log(rows2[0]);
+    //new ObjectsToCsv(rows).toDisk('./csv-files/academic-histories-by-course-general.csv');
+    new ObjectsToCsv(rows2).toDisk('./csv-files/academic-histories-by-semester-general.csv');
+
 }
 
 
