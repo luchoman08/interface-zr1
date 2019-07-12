@@ -1,6 +1,6 @@
 import { Kernel } from "../sra/kernel.mjs";
 import { htmlToAcademicRegistries } from '../sra/lib/academic-history';
-import { TipoBusquedaEstudianteEnum, StudentSearchInput, RegistrosHistorialAcademico } from "../models/index.mjs";
+import { TipoBusquedaEstudianteEnum, StudentSearchInput, RegistrosHistorialAcademico, Estudiante } from "../models/index.mjs";
 import { document_numbers } from "./docs_to_download.mjs";
 import { codes } from "./codes_to_download.mjs";
 
@@ -197,39 +197,59 @@ function main() {
  }
  */
 
+//
+// /**
+//  * Descarga la información desde el sra y la guarda en un csv por notas
+//  */
+// async function main() {
+//
+//     const registries: Array<RegistrosHistorialAcademico> = [];
+//      for(let code of codes ) {
+//          let input = new StudentSearchInput();
+//          let failedCodes = [];
+//          input.codigo_estudiante = String(code);
+//          var searchResult = await appKernel.studentService.searchStudent(input, TipoBusquedaEstudianteEnum.codigoCompleto);
+//         console.log(searchResult, 'search result', code, "code");
+//         if(searchResult.length===0) {
+//             console.error(`El estudiante con código ${code} no se ha encontrado`);
+//             failedCodes.push(code);
+//         } else {
+//             var academicHistory = await appKernel.studentService.getStudentAcademicHistory(searchResult[0]);
+//             registries.push(academicHistory);
+//         }
+//         console.log(failedCodes, 'failed codes');
+//
+//     }
+//     var rows = [];
+//     var rows2 = [];
+//     registries.forEach(registry => {
+//         //rows = rows.concat(academic_history_object_to_rows(registry));
+//         rows2 = rows2.concat(academic_history_object_to_semestral_rows(registry));
+//     });
+//     console.log(rows[0]);
+//     //console.log(rows2[0]);
+//     //new ObjectsToCsv(rows).toDisk('./csv-files/academic-histories-by-course-general.csv');
+//     new ObjectsToCsv(rows2).toDisk('./csv-files/academic-histories-by-semester-general.csv');
+//
+// }
 
 /**
- * Descarga la información desde el sra y la guarda en un csv por notas
+ * Descarga la información basica del estudiantes desde el sra y la guarda en un csv
  */
 async function main() {
-    
-    const registries: Array<RegistrosHistorialAcademico> = [];
-     for(let code of codes ) {
-         let input = new StudentSearchInput();
-         let failedCodes = [];
-         input.codigo_estudiante = String(code);
-         var searchResult = await appKernel.studentService.searchStudent(input, TipoBusquedaEstudianteEnum.codigoCompleto);
-        console.log(searchResult, 'search result', code, "code");
-        if(searchResult.length===0) {
-            console.error(`El estudiante con código ${code} no se ha encontrado`);
-            failedCodes.push(code);
-        } else {
-            var academicHistory = await appKernel.studentService.getStudentAcademicHistory(searchResult[0]);
-            registries.push(academicHistory);
-        }
-        console.log(failedCodes, 'failed codes');
+
+    var search_results: Estudiante = [];
+    console.log(document_numbers.length); return;
+    for(let document of document_numbers ) {
+        let input = new StudentSearchInput();
+        let failedCodes = [];
+        input.doc_number = String(document);
+        var search_result = await appKernel.studentService.searchStudent(input, TipoBusquedaEstudianteEnum.documento);
+        search_results = search_results.concat(search_result);
+        console.log("% ", )
 
     }
-    var rows = [];
-    var rows2 = [];
-    registries.forEach(registry => {
-        //rows = rows.concat(academic_history_object_to_rows(registry));
-        rows2 = rows2.concat(academic_history_object_to_semestral_rows(registry));
-    });
-    console.log(rows[0]);
-    //console.log(rows2[0]);
-    //new ObjectsToCsv(rows).toDisk('./csv-files/academic-histories-by-course-general.csv');
-    new ObjectsToCsv(rows2).toDisk('./csv-files/academic-histories-by-semester-general.csv');
+    new ObjectsToCsv(search_results).toDisk('./csv-files/datos_basicos.csv');
 
 }
 
