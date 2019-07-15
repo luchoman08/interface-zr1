@@ -8,7 +8,10 @@ import fs from 'fs';
 // $FlowFixMe
 import  ObjectsToCsv from 'objects-to-csv';
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-var appKernel = new Kernel("PHPSESSID=c6ce45e532ecfe482cdffe21f9a8e0a2");
+var appKernel = new Kernel("PHPSESSID=ae9bdd8db428e0e88e84fa5385d2a173");
+/**
+ * Buscar el PHPSESSID en cada sesion
+ */
 
 
 /**
@@ -197,46 +200,52 @@ function main() {
  }
  */
 
-//
-// /**
-//  * Descarga la información desde el sra y la guarda en un csv por notas
-//  */
-// async function main() {
-//
-//     const registries: Array<RegistrosHistorialAcademico> = [];
-//      for(let code of codes ) {
-//          let input = new StudentSearchInput();
-//          let failedCodes = [];
-//          input.codigo_estudiante = String(code);
-//          var searchResult = await appKernel.studentService.searchStudent(input, TipoBusquedaEstudianteEnum.codigoCompleto);
-//         console.log(searchResult, 'search result', code, "code");
-//         if(searchResult.length===0) {
-//             console.error(`El estudiante con código ${code} no se ha encontrado`);
-//             failedCodes.push(code);
-//         } else {
-//             var academicHistory = await appKernel.studentService.getStudentAcademicHistory(searchResult[0]);
-//             registries.push(academicHistory);
-//         }
-//         console.log(failedCodes, 'failed codes');
-//
-//     }
-//     var rows = [];
-//     var rows2 = [];
-//     registries.forEach(registry => {
-//         //rows = rows.concat(academic_history_object_to_rows(registry));
-//         rows2 = rows2.concat(academic_history_object_to_semestral_rows(registry));
-//     });
-//     console.log(rows[0]);
-//     //console.log(rows2[0]);
-//     //new ObjectsToCsv(rows).toDisk('./csv-files/academic-histories-by-course-general.csv');
-//     new ObjectsToCsv(rows2).toDisk('./csv-files/academic-histories-by-semester-general.csv');
-//
-// }
+
+ /**
+  * Descarga la información desde el sra y la guarda en un csv por notas
+  */
+ async function main() {
+
+     const registries: Array<RegistrosHistorialAcademico> = [];
+      for(let code of codes ) {
+          let input = new StudentSearchInput();
+          let failedCodes = [];
+          input.codigo_estudiante = String(code);
+          var searchResult = await appKernel.studentService.searchStudent(input, TipoBusquedaEstudianteEnum.codigoCompleto);
+         console.log(searchResult, 'search result', code, "code");
+         if(searchResult.length===0) {
+             console.error(`El estudiante con código ${code} no se ha encontrado`);
+             failedCodes.push(code);
+         } else {
+             var academicHistory = await appKernel.studentService.getStudentAcademicHistory(searchResult[0]);
+             registries.push(academicHistory);
+         }
+         console.log(failedCodes, 'failed codes');
+
+     }
+
+     /**
+      * Para cambiar entre reporte por semestre o por curso, descomentar la que se requiere.
+      */
+
+     var porcurso = [];
+     var porsemestre = [];
+     registries.forEach(registry => {
+         //porcurso = porcurso.concat(academic_history_object_to_rows(registry));
+         porsemestre = porsemestre.concat(academic_history_object_to_semestral_rows(registry));
+     });
+     //console.log(porcurso[0]);
+     console.log(porsemestre[0]);
+     //new ObjectsToCsv(porcurso).toDisk('./csv-files/academic-histories-by-course-general.csv');
+     new ObjectsToCsv(porsemestre).toDisk('./csv-files/prueba1.csv');
+
+ }
 
 /**
  * Descarga la información basica del estudiantes desde el sra y la guarda en un csv
+ * Para usar: descomentar esta funcion, comentar la funcion main de arriba
  */
-async function main() {
+/*async function main() {
 
     var search_results: Estudiante = [];
     console.log(document_numbers.length); return;
@@ -251,7 +260,7 @@ async function main() {
     }
     new ObjectsToCsv(search_results).toDisk('./csv-files/datos_basicos.csv');
 
-}
+}*/
 
 
 // async function main() {
