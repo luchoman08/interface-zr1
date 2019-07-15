@@ -1,3 +1,4 @@
+
 ## Dependencias
 
 - nodejs >= 10
@@ -15,4 +16,3 @@ Debe instalar el plugin `Flow language service` y luego debe deshabilitar el mar
 ```
 "typescript.validate.enable": false,
 "javascript.validate.enable": false,
-
